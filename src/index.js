@@ -37,6 +37,18 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
+// A crash becomes one error record with its stack instead of Node's bare stack trace. The exit
+// code stays 1, so Docker restarts the bot as before.
+process.on('uncaughtException', (error) => {
+  logger.errorWithStack('Startup', 'Uncaught exception, exiting', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.errorWithStack('Startup', 'Unhandled promise rejection, exiting', reason);
+  process.exit(1);
+});
+
 // Start bot
 bot.initialize().catch((error) => {
   logger.errorWithStack('Startup', 'Failed to initialize bot', error);
