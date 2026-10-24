@@ -19,6 +19,7 @@ export class WhatsAppBot {
   constructor() {
     this.client = null;
     this.isReady = false;
+    this.pluginsInitialized = false;
     this.transcriptionPlugin = null;
     this.birthdayPlugin = null;
     this.reminderPlugin = null;
@@ -108,6 +109,14 @@ export class WhatsAppBot {
     this.client.on('ready', async () => {
       logger.info('Bot', 'WhatsApp client ready');
       this.isReady = true;
+
+      // `ready` fires again when WhatsApp Web reloads (right after startup, after reconnects).
+      // The plugins keep using the same client, so they are set up once: each further
+      // initialize() started another set of schedulers, and every daily check ran twice.
+      if (this.pluginsInitialized) {
+        return;
+      }
+      this.pluginsInitialized = true;
       this.logBotInfo();
 
       // Initialize response helper with client
