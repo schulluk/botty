@@ -249,6 +249,8 @@ whatsapp-bot/
 | `PROFILE_MOVIE_PATH` | No | Absolute/relative path to the MP4/MKV file used for Profile Cinema | `./data/profile.mp4` |
 | `PROFILE_MESSAGE_INTERVAL` | No | Advance one key frame after this many received messages | `25` |
 | `PROFILE_FRAME_MAX_KB` | No | Maximum allowed size for the generated JPEG (defaults to 100 KB) | `90` |
+| `LOG_LEVEL` | No | Lowest level that is logged: `debug`, `info`, `warn` or `error` | `info` (default) |
+| `LOG_FORMAT` | No | Unset: one line per record, `2026-10-24 08:50:21 INFO     Bot: WhatsApp client ready` (Swiss local time, whatever `BOT_TIMEZONE` is); `json`: one JSON object per line | `json` |
 
 Both schedulers run with `node-cron` in the configured timezone, persist their queue state to `data/`, and reschedule anything missed during restarts so reminders and birthday wishes still go out even if the container was offline earlier.
 
@@ -264,15 +266,13 @@ The bot uses a single timezone setting (`BOT_TIMEZONE`) for all scheduling opera
 
 **Example startup output:**
 ```
-🌍 Timezone: Europe/Zurich
-   (configured via BOT_TIMEZONE environment variable)
+2026-10-24 08:50:21 INFO     Startup: Timezone configured timezone=Europe/Zurich source="BOT_TIMEZONE env var"
 ```
 
 or:
 
 ```
-🌍 Timezone: America/New_York
-   (auto-detected from system)
+2026-10-24 08:50:21 INFO     Startup: Timezone configured timezone=America/New_York source=auto-detected
 ```
 
 **Why this matters:** All date-based operations (birthday tracking, reminder scheduling, daily message tracking) use this timezone to determine "today" and when to trigger events. If you're in `Europe/Zurich` but the bot uses `America/New_York`, birthday wishes might arrive at unexpected times.
@@ -470,7 +470,7 @@ environment:
 - Format: `+1234567890` (no spaces, dashes, or parentheses)
 
 ### Bot Not Responding
-- Check if bot is authenticated (look for "✅ WhatsApp Bot is ready!")
+- Check if bot is authenticated (look for "WhatsApp client ready")
 - Verify authorized number format
 - Check command syntax (must start with `!`)
 
@@ -511,8 +511,7 @@ BOT_TIMEZONE=Europe/Zurich
 
 Check the timezone at startup in the logs:
 ```
-🌍 Timezone: Europe/Zurich
-   (configured via BOT_TIMEZONE environment variable)
+2026-10-24 08:50:21 INFO     Startup: Timezone configured timezone=Europe/Zurich source="BOT_TIMEZONE env var"
 ```
 
 ## Cost Estimation

@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { logger } from './utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,7 +15,7 @@ const getTimezone = () => {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   } catch (error) {
-    process.stderr.write('{"level":"warn","component":"Config","message":"Could not detect system timezone, defaulting to Europe/Berlin"}\n');
+    logger.warn('Config', 'Could not detect system timezone, defaulting to Europe/Berlin');
     return 'Europe/Berlin';
   }
 };
