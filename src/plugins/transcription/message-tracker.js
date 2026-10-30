@@ -15,6 +15,8 @@ export class MessageTracker {
     this.cleanupInterval = setInterval(() => {
       this.cleanupTranscriptions();
     }, config.transcription.cleanupIntervalMs);
+    // Don't keep the process (or test runner) alive just for the cleanup timer
+    this.cleanupInterval.unref();
   }
 
   isProcessing(messageId) {
