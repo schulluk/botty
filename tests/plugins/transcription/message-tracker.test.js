@@ -10,8 +10,7 @@ describe('MessageTracker', () => {
     to: 'me',
     fromMe: false,
     id: { _serialized: 'msg123' },
-    reply: mock.fn(),
-    getChat: mock.fn(async () => ({ markUnread: mock.fn() }))
+    reply: mock.fn()
   };
 
   beforeEach(() => {

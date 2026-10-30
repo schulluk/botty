@@ -74,7 +74,13 @@ export class MessageTracker {
 
         // Reply to the original message (solves race condition!)
         // By quoting, each transcription is tied to its source message
-        const replyMsg = await message.reply(i18n.t('transcriptionResult', transcriptionText));
+        // sendSeen: false keeps the chat unread and the phone notification alive,
+        // and avoids sending blue ticks (read receipts) to the sender
+        const replyMsg = await message.reply(
+          i18n.t('transcriptionResult', transcriptionText),
+          undefined,
+          { sendSeen: false }
+        );
 
         // Store transcription message for potential deletion
         this.transcriptionMessages.set(messageId, {
@@ -82,18 +88,6 @@ export class MessageTracker {
           timestamp: Date.now()
         });
 
-        // Mark as unread
-        try {
-          const chat = await message.getChat();
-          if (chat) {
-            await chat.markUnread();
-          }
-        } catch (chatError) {
-          logger.error('MessageTracker', 'Failed to mark chat as unread', {
-            messageId,
-            error: chatError.message
-          });
-        }
         // Mark as completed
         this.completed.set(messageId, Date.now());
 
@@ -106,7 +100,7 @@ export class MessageTracker {
           const errorDetail = error.message.includes('timeout')
             ? i18n.t('transcriptionTimeout')
             : i18n.t('transcriptionRetry');
-          await message.reply(i18n.t('transcriptionFailed') + errorDetail);
+          await message.reply(i18n.t('transcriptionFailed') + errorDetail, undefined, { sendSeen: false });
         } catch (replyError) {
           logger.error('MessageTracker', 'Failed to send error message', {
             messageId,
